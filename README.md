@@ -28,9 +28,10 @@ after installation there will be a new menu item in the parameters menu: `BROADC
 
 you can go into this menu and change your station name and toggle broadcasting off or on.
 
-![off](https://user-images.githubusercontent.com/6550035/148565240-96f79425-5c8a-42cd-a629-3bb2f139252c.png)
+![11](https://user-images.githubusercontent.com/6550035/148567598-820c8c3f-25dd-40b9-8fbd-17b765b11401.png)
 
-![on](https://user-images.githubusercontent.com/6550035/148565246-6ab76ee5-68da-498c-9ea8-885bbc36ae5f.png)
+![22](https://user-images.githubusercontent.com/6550035/148567603-8aaef393-c979-4225-af56-76a2929b7c2f.png)
+g)
 
 
 when you begin broadcasting you will see a URL that you can goto to listen to your stream.
