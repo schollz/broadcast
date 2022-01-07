@@ -19,7 +19,7 @@ broadcast will install ~2.5 MB of linux packages when you run it the first time 
 
 ### Documentation
 
-you can install *broadcast* and then activate the mod in the `SYSTEM > MODS > BROADCAST`. after activating for the first time you need to restart `SYSTEM > RESTART`. 
+you can install *broadcast* and then activate the mod in the `SYSTEM > MODS > BROADCAST`. after activating for the first time you need to restart `SYSTEM > RESTART`. (this first restart may take a few minutes, during which your screen may be blank).
 
 after installation you can activate the broadcast by going to `SYSTEM > MODS > BROADCAST`. first use E3 to select `edit station name` and press K3 to enter in your station name. then you can use E3 to select `offline` and press K3 to turn go `online`. if you are "online" you can use the URL to listen to your norns.
 
