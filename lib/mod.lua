@@ -4,12 +4,12 @@
 -- after idea of @mlogger @Justmat @infinitedigits
 -- !! Requires MPV installed, run 'sudo apt-get install mpv' once, might require 'sudo apt-get update' before!
 
-
 -- require the `mods` module to gain access to hooks, menu, and other utility
 -- functions.
 --
 
 local mod=require 'core/mods'
+local textentry=require('textentry')
 
 --
 -- [optional] a mod is like any normal lua module. local variables can be used
@@ -20,9 +20,10 @@ local mod=require 'core/mods'
 --
 
 local state={
-  x=0,
+  x=1,
+  is_running=false,
+  station="",
 }
-
 
 --
 -- [optional] hooks are essentially callbacks which can be used by multiple mods
@@ -44,80 +45,25 @@ mod.hook.register("system_post_startup","broadcast mod setup",function()
   os.execute("chmod +x /home/we/dust/code/broadcast/broadcast2.sh")
   local toinstall=""
   local s=util.os_capture("which icecast2")
-  print(s)
-  if s=="" then 
-	  print("installing icecast2")
-	  toinstall=toinstall.."icecast2 "
+  if s=="" then
+    print("installing icecast2")
+    toinstall=toinstall.."icecast2 "
   end
   local s=util.os_capture("which darkice")
-  print(s)
-  if s=="" then 
-	  print("installing darkice")
-	  toinstall=toinstall.."darkice "
+  if s=="" then
+    print("installing darkice")
+    toinstall=toinstall.."darkice "
   end
-  if toinstall~="" then 
-	  local cmd="DEBIAN_FRONTEND=noninteractive sudo apt-get install -q -y "..toinstall
-	  print('running '..cmd)
-	  os.execute("sudo apt-get update")
-	  os.execute(cmd)
+  if toinstall~="" then
+    local cmd="DEBIAN_FRONTEND=noninteractive sudo apt-get install -q -y "..toinstall
+    print('running '..cmd)
+    os.execute("sudo apt-get update")
+    os.execute(cmd)
   end
 end)
 
 mod.hook.register("script_pre_init","broadcast mod init",function()
-  if not util.file_exists(_path.data.."broadcast") then
-	  os.execute("mkdir -p ".._path.data.."broadcast")
-  end
-  local fname=_path.data.."broadcast/station"
-  local station=""
-  if util.file_exists(fname) then 
-	  local f=assert(io.open(fname,"rb"))
-	  if f~=nil then 
-	  	local content=f:read("*all")
-	  	f:close()
-	  	if content~=nil then 
-			  station=(content:gsub("^%s*(.-)%s*$", "%1"))
-	  	end
-	end
-  end
-
-  local is_running=string.find(util.os_capture("ps aux | grep broadcast0 | grep -v grep"),"broadcast0")
-  params:add_group("BROADCAST",4)
-  params:add_text("broadcast station","station name",station)
-  params:set_action("broadcast station",function(x)
-	  local f=io.open(_path.data.."broadcast/station","w")
-	  f:write(x)
-	  io.close(f)
-  end)
-  params:add_option("broadcast","broadcast",{"off","on"},is_running and 2 or 1)
-  params:add_text("broadcast url","",is_running and "broadcast.norns.online/" or "")
-  params:add_text("broadcast url2","",is_running and station..".mp3" or "")
-  params:set_action("broadcast",function(x)
-	  local station=params:get("broadcast station")
-	  if station=="" or station==nil or x==1 then 
-	  params:hide("broadcast url")
-	  params:hide("broadcast url2")
-	  _menu.rebuild_params()
-		  os.execute("pkill -f broadcast0")
-		  os.execute("pkill -f broadcast2")
-		  os.execute("pkill -f radio.mp3")
-		  os.execute("pkill -f broadcast1")
-		  os.execute("pkill -9 icecast2")
-		  os.execute("pkill -9 darkice")
-		  do return end
-	  end
-          os.execute("nohup /home/we/dust/code/broadcast/broadcast0.sh "..station.." &")
-	  params:set("broadcast url","broadcast.norns.online/")
-	  params:set("broadcast url2",station..".mp3")
-	  params:show("broadcast url")
-	  params:show("broadcast url2")
-	  _menu.rebuild_params()
-  end)
-  if not is_running then 
-	  params:hide("broadcast url")
-	  params:hide("broadcast url2")
-  end
 end)
-
 
 --
 -- [optional] menu: extending the menu system is done by creating a table with
@@ -126,28 +72,98 @@ end)
 
 local m={}
 
+m.toggle_station=function(start)
+  -- start/stop station
+  os.execute("pkill -f broadcast0")
+  os.execute("pkill -f broadcast2")
+  os.execute("pkill -f radio.mp3")
+  os.execute("pkill -f broadcast1")
+  os.execute("pkill -9 icecast2")
+  os.execute("pkill -9 darkice")
+  if (state.is_running==false and (start==nil or start==true)) and state.station~="" then
+    os.execute("nohup /home/we/dust/code/broadcast/broadcast0.sh "..state.station.." &")
+    state.is_running=true
+  else
+    state.is_running=false
+  end
+end
+
 m.key=function(n,z)
   if n==2 and z==1 then
     -- return to the mod selection menu
     mod.menu.exit()
   end
+  if n==3 and z==1 then
+    if state.x==2 then
+      -- change station
+      textentry.enter(function(x)
+        if x==nil then
+          do return end
+        end
+        print("new station: "..x)
+        state.station=x
+        local f=io.open(_path.data.."broadcast/station","w")
+        f:write(x)
+        io.close(f)
+        m.toggle_station(state.is_running)
+        mod.menu.redraw()
+      end,state.station,"enter a station name")
+    elseif state.x==1 then
+      m.toggle_station()
+    end
+  end
+  mod.menu.redraw()
 end
 
 m.enc=function(n,d)
-  -- tell the menu system to redraw, which in turn calls the mod's menu redraw
-  -- function
+  if d>0 then
+    state.x=2
+  elseif d<0 then
+    state.x=1
+  end
   mod.menu.redraw()
 end
 
 m.redraw=function()
   screen.clear()
---  screen.move(64,40)
---  screen.text_center("radio aporee  "..state.x)
+  screen.level(state.x==1 and 15 or 5)
+  screen.move(64,20)
+  screen.text_center(state.is_running and "online" or "offline")
+  if state.station~="" then
+    screen.level(5)
+    screen.move(64,32)
+    screen.text_center("broadcast.norns.online/")
+    screen.move(64,40)
+    screen.text_center(state.station..".mp3")
+  end
+  screen.level(state.x==2 and 15 or 5)
+  screen.move(64,52)
+  screen.text_center("edit station name")
   screen.update()
 end
 
 m.init=function()
-
+  print("menu init")
+  state.is_running=false
+  state.station=""
+  if not util.file_exists(_path.data.."broadcast") then
+    os.execute("mkdir -p ".._path.data.."broadcast")
+  end
+  local fname=_path.data.."broadcast/station"
+  if util.file_exists(fname) then
+    local f=assert(io.open(fname,"rb"))
+    if f~=nil then
+      local content=f:read("*all")
+      f:close()
+      if content~=nil then
+        state.station=(content:gsub("^%s*(.-)%s*$","%1"))
+      end
+    end
+  end
+  state.is_running=string.find(util.os_capture("ps aux | grep broadcast0 | grep -v grep"),"broadcast0")
+  if state.is_running==nil then
+    state.is_running=false
+  end
 end -- on menu entry, ie, if you wanted to start timers
 
 m.deinit=function() end -- on menu exit
@@ -159,7 +175,6 @@ m.deinit=function() end -- on menu exit
 -- registered with a name which matches the name of the mod in the dust folder.
 --
 mod.menu.register(mod.this_name,m)
-
 
 --
 -- [optional] returning a value from the module allows the mod to provide
