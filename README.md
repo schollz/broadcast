@@ -7,10 +7,10 @@ a norns mod to create a public mp3 stream from your norns.
 
 broadcast is a simple mod that lets you make a dedicated music stream from your norns. the output is a public URL of an mp3 that can be listened to in a browser, in music apps, etc.
 
-broadcast works by using `[darkice](http://www.darkice.org/)` and `[icecast2](https://icecast.org/)` which interface with JACK and convert the norns output into a mp3 stream (which is [configurable](https://github.com/schollz/broadcast/blob/main/darkice.cfg#L18)). this local stream is then streamed via `curl` to a server I setup at `broadcast.norns.online`. [the server](https://github.com/schollz/broadcast-server) is ~200 lines of code that simply copy bytes from a POST request (i.e. the stream) to any number of GET requests (i.e. browser client(s)).
+broadcast works by using [`darkice`](http://www.darkice.org/) and [`icecast2`](https://icecast.org/) which interface with JACK and convert the norns output into a mp3 stream (which is [configurable](https://github.com/schollz/broadcast/blob/main/darkice.cfg#L18)). this local stream is then streamed via `curl` to a server I setup at `broadcast.norns.online`. [the server](https://github.com/schollz/broadcast-server) is ~200 lines of code that simply copy bytes from a POST request (i.e. the stream) to any number of GET requests (i.e. browser client(s)).
 
 
-broadcast will install ~2.5 MB of linux packages when you run it the first time and while running will take a small amount of CPU to run the stream conversion.
+broadcast will install ~2.5 MB of linux packages when you run it the first time and while running will take a small amount of CPU to run the stream conversion, and use some internet bandwidth to upload the stream.
 
 ### Requirements
 
@@ -28,9 +28,10 @@ after installation there will be a new menu item in the parameters menu: `BROADC
 
 you can go into this menu and change your station name and toggle broadcasting off or on.
 
-![off](https://user-images.githubusercontent.com/6550035/148565240-96f79425-5c8a-42cd-a629-3bb2f139252c.png)
+![11](https://user-images.githubusercontent.com/6550035/148567598-820c8c3f-25dd-40b9-8fbd-17b765b11401.png)
 
-![on](https://user-images.githubusercontent.com/6550035/148565246-6ab76ee5-68da-498c-9ea8-885bbc36ae5f.png)
+![22](https://user-images.githubusercontent.com/6550035/148567603-8aaef393-c979-4225-af56-76a2929b7c2f.png)
+g)
 
 
 when you begin broadcasting you will see a URL that you can goto to listen to your stream.
