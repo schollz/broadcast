@@ -2,7 +2,7 @@
 
 a norns mod to create a public mp3 stream from your norns.
 
-![image](https://user-images.githubusercontent.com/6550035/148565246-6ab76ee5-68da-498c-9ea8-885bbc36ae5f.png)
+![image](https://user-images.githubusercontent.com/6550035/148573879-0a419172-9ad3-4d31-89c1-ea3176da87f7.png)
 
 
 broadcast is a simple mod that lets you make a dedicated music stream from your norns. the output is a public URL of an mp3 that can be listened to in a browser, in music apps, etc.
@@ -21,21 +21,7 @@ broadcast will install ~2.5 MB of linux packages when you run it the first time 
 
 you can install *broadcast* and then activate the mod in the `SYSTEM > MODS > BROADCAST`. after activating for the first time you need to restart `SYSTEM > RESTART`. 
 
-after installation there will be a new menu item in the parameters menu: `BROADCAST`.
-
-
-![broadcast](https://user-images.githubusercontent.com/6550035/148565235-bffa75a4-42ad-489b-bc07-e4ad8ac489e7.png)
-
-you can go into this menu and change your station name and toggle broadcasting off or on.
-
-![11](https://user-images.githubusercontent.com/6550035/148567598-820c8c3f-25dd-40b9-8fbd-17b765b11401.png)
-
-![22](https://user-images.githubusercontent.com/6550035/148567603-8aaef393-c979-4225-af56-76a2929b7c2f.png)
-g)
-
-
-when you begin broadcasting you will see a URL that you can goto to listen to your stream.
-
+after installation you can activate the broadcast by going to `SYSTEM > MODS > BROADCAST`. first use E3 to select `edit station name` and press K3 to enter in your station name. then you can use E3 to select `offline` and press K3 to turn go `online`. if you are "online" you can use the URL to listen to your norns.
 
 
 ### Download
