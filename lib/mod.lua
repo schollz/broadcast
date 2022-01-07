@@ -37,18 +37,37 @@ local state={
 -- and test out access to mod level state via mod supplied fuctions.
 --
 
-mod.hook.register("system_post_startup","my startup hacks",function()
+mod.hook.register("system_post_startup","broadcast mod setup",function()
   state.system_post_startup=true
-  os.execute("chmod +x /home/we/dust/code/radio-broadcast/broadcast0.sh")
-  os.execute("chmod +x /home/we/dust/code/radio-broadcast/broadcast1.sh")
-  os.execute("chmod +x /home/we/dust/code/radio-broadcast/broadcast2.sh")
+  os.execute("chmod +x /home/we/dust/code/broadcast/broadcast0.sh")
+  os.execute("chmod +x /home/we/dust/code/broadcast/broadcast1.sh")
+  os.execute("chmod +x /home/we/dust/code/broadcast/broadcast2.sh")
+  local toinstall=""
+  local s=util.os_capture("which icecast2")
+  print(s)
+  if s=="" then 
+	  print("installing icecast2")
+	  toinstall=toinstall.."icecast2 "
+  end
+  local s=util.os_capture("which darkice")
+  print(s)
+  if s=="" then 
+	  print("installing darkice")
+	  toinstall=toinstall.."darkice "
+  end
+  if toinstall~="" then 
+	  local cmd="DEBIAN_FRONTEND=noninteractive sudo apt-get install -q -y "..toinstall
+	  print('running '..cmd)
+	  os.execute("sudo apt-get update")
+	  os.execute(cmd)
+  end
 end)
 
-mod.hook.register("script_pre_init","my init hacks",function()
-  if not util.file_exists(_path.data.."radio-broadcast") then
-	  os.execute("mkdir -p ".._path.data.."radio_broadcast")
+mod.hook.register("script_pre_init","broadcast mod init",function()
+  if not util.file_exists(_path.data.."broadcast") then
+	  os.execute("mkdir -p ".._path.data.."broadcast")
   end
-  local fname=_path.data.."radio-broadcast/station"
+  local fname=_path.data.."broadcast/station"
   local station=""
   if util.file_exists(fname) then 
 	  local f=assert(io.open(fname,"rb"))
@@ -56,16 +75,16 @@ mod.hook.register("script_pre_init","my init hacks",function()
 	  	local content=f:read("*all")
 	  	f:close()
 	  	if content~=nil then 
-			  station=content
+			  station=(content:gsub("^%s*(.-)%s*$", "%1"))
 	  	end
 	end
   end
 
   local is_running=string.find(util.os_capture("ps aux | grep broadcast0 | grep -v grep"),"broadcast0")
-  params:add_group("RADIO BROADCASTING",4)
+  params:add_group("BROADCAST",4)
   params:add_text("broadcast station","station name",station)
   params:set_action("broadcast station",function(x)
-	  local f=io.open(_path.data.."radio-broadcast/station","w")
+	  local f=io.open(_path.data.."broadcast/station","w")
 	  f:write(x)
 	  io.close(f)
   end)
@@ -86,7 +105,7 @@ mod.hook.register("script_pre_init","my init hacks",function()
 		  os.execute("pkill -9 darkice")
 		  do return end
 	  end
-          os.execute("nohup /home/we/dust/code/radio-broadcast/broadcast0.sh "..station.." &")
+          os.execute("nohup /home/we/dust/code/broadcast/broadcast0.sh "..station.." &")
 	  params:set("broadcast url","broadcast.norns.online/")
 	  params:set("broadcast url2",station..".mp3")
 	  params:show("broadcast url")
