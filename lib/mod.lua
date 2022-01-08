@@ -110,9 +110,9 @@ m.key=function(n,z)
           do return end
         end
         print("new station: "..x)
-        state.station=x
+        state.station=x:gsub("%s+","")
         local f=io.open(_path.data.."broadcast/station","w")
-        f:write(x)
+        f:write(state.station)
         io.close(f)
         if state.is_running then 
           m.toggle_station(true)
@@ -173,6 +173,7 @@ m.init=function()
       f:close()
       if content~=nil then
         state.station=(content:gsub("^%s*(.-)%s*$","%1"))
+        state.station=state.station:gsub("%s+","")
       end
     end
   end
