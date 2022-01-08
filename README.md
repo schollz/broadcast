@@ -2,7 +2,7 @@
 
 a norns mod to create a public mp3 stream from your norns.
 
-![image](https://user-images.githubusercontent.com/6550035/148573879-0a419172-9ad3-4d31-89c1-ea3176da87f7.png)
+![broadcast](https://user-images.githubusercontent.com/6550035/148649812-feafa0f0-4512-42da-8cf6-16790ac77c2c.png)
 
 
 broadcast is a simple mod that lets you make a dedicated music stream from your norns. the output is a public URL of an mp3 that can be listened to in a browser, in music apps, etc.
@@ -23,6 +23,7 @@ you can install *broadcast* and then activate the mod in the `SYSTEM > MODS > BR
 
 after installation you can activate the broadcast by going to `SYSTEM > MODS > BROADCAST`. first use E3 to select `edit station name` and press K3 to enter in your station name. then you can use E3 to select `offline` and press K3 to turn go `online`. if you are "online" you can use the URL to listen to your norns.
 
+you can advertise your stream by toggling "advertise" to "true". then your stream will be listed at [`broadcast.norns.online`](https://broadcast.norns.online). _note_: **all the streams are public so don’t share anything private. the streams are not password-protected or anything. but the URL for your stream is private unless you share it (technically the server also sees the URL but I don’t keep logs so I don’t see it…).**
 
 ### Download
 
