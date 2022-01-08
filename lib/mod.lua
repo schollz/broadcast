@@ -22,6 +22,7 @@ local textentry=require('textentry')
 local state={
   x=1,
   is_running=false,
+  advertise="false",
   station="",
 }
 
@@ -80,8 +81,8 @@ m.toggle_station=function(start)
   os.execute("pkill -f broadcast1")
   os.execute("pkill -9 icecast2")
   os.execute("pkill -9 darkice")
-  if (state.is_running==false and (start==nil or start==true)) and state.station~="" then
-    os.execute("nohup /home/we/dust/code/broadcast/broadcast0.sh "..state.station.." &")
+  if (state.is_running==false or start==true) and state.station~="" then
+    os.execute("nohup /home/we/dust/code/broadcast/broadcast0.sh "..state.station.." "..state.advertise.." &")
     state.is_running=true
   else
     state.is_running=false
@@ -94,7 +95,15 @@ m.key=function(n,z)
     mod.menu.exit()
   end
   if n==3 and z==1 then
-    if state.x==2 then
+    if state.x==3 then  
+      state.advertise=state.advertise=="false" and "true" or "false"
+      local f=io.open(_path.data.."broadcast/advertise","w")
+      f:write(state.advertise)
+      io.close(f)
+      if state.is_running then 
+        m.toggle_station(true)
+      end
+    elseif state.x==2 then
       -- change station
       textentry.enter(function(x)
         if x==nil then
@@ -105,7 +114,9 @@ m.key=function(n,z)
         local f=io.open(_path.data.."broadcast/station","w")
         f:write(x)
         io.close(f)
-        m.toggle_station(state.is_running)
+        if state.is_running then 
+          m.toggle_station(true)
+        end
         mod.menu.redraw()
       end,state.station,"enter a station name")
     elseif state.x==1 then
@@ -116,29 +127,34 @@ m.key=function(n,z)
 end
 
 m.enc=function(n,d)
-  if d>0 then
-    state.x=2
-  elseif d<0 then
-    state.x=1
+  if d>0 then 
+    d=1 
+  elseif d<0 then 
+    d=-1 
   end
+  state.x=util.clamp(state.x+d,1,3)
   mod.menu.redraw()
 end
 
 m.redraw=function()
+  local yy=-8
   screen.clear()
   screen.level(state.x==1 and 15 or 5)
-  screen.move(64,20)
+  screen.move(64,20+yy)
   screen.text_center(state.is_running and "online" or "offline")
   if state.station~="" then
     screen.level(5)
-    screen.move(64,32)
+    screen.move(64,32+yy)
     screen.text_center("broadcast.norns.online/")
-    screen.move(64,40)
+    screen.move(64,40+yy)
     screen.text_center(state.station..".mp3")
   end
   screen.level(state.x==2 and 15 or 5)
-  screen.move(64,52)
+  screen.move(64,52+yy)
   screen.text_center("edit station name")
+  screen.level(state.x==3 and 15 or 5)
+  screen.move(64,62+yy)
+  screen.text_center("advertise: "..state.advertise)
   screen.update()
 end
 
@@ -157,6 +173,17 @@ m.init=function()
       f:close()
       if content~=nil then
         state.station=(content:gsub("^%s*(.-)%s*$","%1"))
+      end
+    end
+  end
+  local fname=_path.data.."broadcast/advertise"
+  if util.file_exists(fname) then
+    local f=assert(io.open(fname,"rb"))
+    if f~=nil then
+      local content=f:read("*all")
+      f:close()
+      if content~=nil then
+        state.advertise=(content:gsub("^%s*(.-)%s*$","%1"))
       end
     end
   end
