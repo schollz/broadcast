@@ -28,5 +28,5 @@ if (( $(ps -ef | grep -v grep | grep radio.mp3 | wc -l) > 0 ))
 then
  echo "broadcaster running" > /dev/null
 else
- nohup /home/we/dust/code/broadcast/broadcast2.sh "${1}" "${2}" &
+ nohup /home/we/dust/code/broadcast/broadcast2.sh "${1}" "${2}" "${3}" &
 fi

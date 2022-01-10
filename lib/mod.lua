@@ -23,6 +23,7 @@ local state={
   x=1,
   is_running=false,
   advertise="false",
+  archive="false",
   station="",
 }
 
@@ -82,7 +83,7 @@ m.toggle_station=function(start)
   os.execute("pkill -9 icecast2")
   os.execute("pkill -9 darkice")
   if (state.is_running==false or start==true) and state.station~="" then
-    os.execute("nohup /home/we/dust/code/broadcast/broadcast0.sh "..state.station.." "..state.advertise.." &")
+    os.execute("nohup /home/we/dust/code/broadcast/broadcast0.sh "..state.station.." "..state.advertise.." "..state.archive.." &")
     state.is_running=true
   else
     state.is_running=false
@@ -99,6 +100,14 @@ m.key=function(n,z)
       state.advertise=state.advertise=="false" and "true" or "false"
       local f=io.open(_path.data.."broadcast/advertise","w")
       f:write(state.advertise)
+      io.close(f)
+      if state.is_running then 
+        m.toggle_station(true)
+      end
+    elseif state.x==4 then  
+      state.archive=state.archive=="false" and "true" or "false"
+      local f=io.open(_path.data.."broadcast/archive","w")
+      f:write(state.archive)
       io.close(f)
       if state.is_running then 
         m.toggle_station(true)
@@ -132,7 +141,7 @@ m.enc=function(n,d)
   elseif d<0 then 
     d=-1 
   end
-  state.x=util.clamp(state.x+d,1,3)
+  state.x=util.clamp(state.x+d,1,4)
   mod.menu.redraw()
 end
 
@@ -153,8 +162,11 @@ m.redraw=function()
   screen.move(64,52+yy)
   screen.text_center("edit station name")
   screen.level(state.x==3 and 15 or 5)
-  screen.move(64,62+yy)
-  screen.text_center("advertise: "..state.advertise)
+  screen.move(35,62+yy)
+  screen.text_center("advertise:"..state.advertise)
+  screen.level(state.x==4 and 15 or 5)
+  screen.move(36+64,62+yy)
+  screen.text_center("archive:"..state.archive)
   screen.update()
 end
 
@@ -185,6 +197,17 @@ m.init=function()
       f:close()
       if content~=nil then
         state.advertise=(content:gsub("^%s*(.-)%s*$","%1"))
+      end
+    end
+  end
+  local fname=_path.data.."broadcast/archive"
+  if util.file_exists(fname) then
+    local f=assert(io.open(fname,"rb"))
+    if f~=nil then
+      local content=f:read("*all")
+      f:close()
+      if content~=nil then
+        state.archive=(content:gsub("^%s*(.-)%s*$","%1"))
       end
     end
   end
