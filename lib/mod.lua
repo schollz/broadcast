@@ -57,7 +57,7 @@ mod.hook.register("system_post_startup","broadcast mod setup",function()
     toinstall=toinstall.."darkice "
   end
   if toinstall~="" then
-    local cmd="DEBIAN_FRONTEND=noninteractive sudo apt-get install -q -y "..toinstall
+    local cmd="sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq "..toinstall
     print('running '..cmd)
     os.execute("sudo apt-get update")
     os.execute(cmd)
