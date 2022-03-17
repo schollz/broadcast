@@ -154,7 +154,7 @@ m.redraw=function()
   if state.station~="" then
     screen.level(5)
     screen.move(64,32+yy)
-    screen.text_center("broadcast.norns.online/")
+    screen.text_center("streamyouraudio.com/")
     screen.move(64,40+yy)
     screen.text_center(state.station..".mp3")
   end
